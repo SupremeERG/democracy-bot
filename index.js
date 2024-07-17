@@ -3,8 +3,7 @@ const fs = require("fs");
 const path = require('node:path');
 const discord = require('discord.js');
 const cmdHandler = require("./handlers/command.js")
-const eventsPath = path.join(__dirname, 'events');
-const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const eventHandler = require("./handlers/events.js");
 
 const client = new discord.Client({ intents: [discord.GatewayIntentBits.Guilds] });
 
@@ -13,15 +12,7 @@ client.cooldowns = new discord.Collection();
 cmdHandler.initialize(client.commands);
 
 
-for (const file of eventFiles) {
-	const filePath = path.join(eventsPath, file);
-	const event = require(filePath);
-	if (event.once) {
-		client.once(event.name, (...args) => event.execute(...args));
-	} else {
-		client.on(event.name, (...args) => event.execute(...args));
-	}
-}
+eventHandler.listen(client)
 
 
 
