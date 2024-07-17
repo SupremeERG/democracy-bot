@@ -4,13 +4,25 @@ pragma solidity ^0.8.19;
 contract Ballot {
     struct Voter {
         string username; // discord username
-    }
-
+    };
     struct Candidate {
+        int electionID;
         string username; // discord username
         string role; // the role they are campaigning for
         int votes; // number of votes the user has
-    }
+    };
+    struct Election {
+        string initiator;
+        string role;
+        Voter[] voters;
+        Candidate[] candidates;
+
+    };
+
+    mapping(int electionID => Election electionObject) elections;
+
+
+
 
     // owner = election initiator
     // role = the role the election is held for
@@ -22,7 +34,6 @@ contract Ballot {
         uint duration,
         uint endTime
     );
-
     event electionEnded(string winner, string role, uint duration);
 
     function startElection(string memory initiator, string memory role, uint duration) public {
@@ -33,14 +44,14 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
-        // I dont know how we'll store data
-        // maybe we can create a map or array here that can be accessed by other functions
- 
+        elections[electionID] = Election(initiator, role, [], []);
+
         emit electionInitiated(electionID, initiator, role, duration, endTime);
     }
 
-    function addCandidate(uint electionID, string memory username) public {
+    function addCandidate(int electionID, string memory username) public {
         // adds candidate to election
+
     }
 
     function vote() public {}
