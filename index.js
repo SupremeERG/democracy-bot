@@ -16,9 +16,5 @@ eventHandler.listen(client)
 
 
 
-client.once(discord.Events.ClientReady, readyClient => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
-
 // Log in to Discord with your client's token
 client.login(process.env.BOT_TOKEN);
