@@ -36,6 +36,7 @@ module.exports = {
         try {
             const tx = await contract.addCandidate(electionID, username, role);
             await tx.wait();
+            // listen for event in events/candidateAdded.js
             await interaction.reply(`Candidate ${username} added to election ${electionID} for role ${role}.`);
         } catch (error) {
             console.error(error);

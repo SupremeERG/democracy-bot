@@ -6,7 +6,6 @@ contract Ballot {
         string username; // discord username
     }
     struct Candidate {
-        int electionID;
         string username; // discord username
         int votes; // number of votes the user has
     }
@@ -18,14 +17,11 @@ contract Ballot {
     }
 
     mapping(int electionID => Election electionObject) elections;
-    // ----> incorrect syntax?
-    // Change ----> mapping(int => Election ) public elections;
 
     // owner = election initiator
     // role = the role the election is held for
     // duration = the amount of time the election is running
 
-    // Change ------> Added capital, lowercase is unconventional
     event ElectionInitiated(  
         int electionID,
         string owner,
@@ -50,10 +46,8 @@ contract Ballot {
         emit ElectionInitiated(electionID, initiator, role, duration, endTime);
     }
 
-    // Added ----> Changed function name to suit more of the role IMO / Chnage back if you wish
     function addCandidate(int electionID, string memory username) public {
         Candidate memory newCandidate = Candidate({
-            electionID: electionID,
             username: username,
             votes: 0
         });
@@ -63,13 +57,12 @@ contract Ballot {
         emit CandidateAdded(electionID, username);
     }
 
-    // Added ---> Parameters
     function vote(int electionID, string memory username) public {
         // Voting logic
     }
 
     // Added ----> Return types and had to make public
-    function getResults(int electionID) public view returns (string memory winner, int voteCount) {
+    function getResults(int electionID) public view returns (string memory winner, mapping(string candidate => int votes)) {
         // this function should only return the winning user as well as vote statistics
         // the discord bot should handle all roles and administration
     }
