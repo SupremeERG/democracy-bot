@@ -2,18 +2,14 @@ const { SlashCommandBuilder } = require('discord.js');
 const { ethers } = require('ethers');
 require('dotenv').config();
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
 const privateKey = process.env.PRIVATE_KEY;
 const wallet = new ethers.Wallet(privateKey, provider);
 const contractAddress = process.env.CONTRACT_ADDRESS;
-const abi = [
-    // contract ABI
-];
-const contract = new ethers.Contract(contractAddress, abi, wallet);
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('addCandidate')
+        .setName('add_candidate')
         .setDescription('Adds a candidate to an election.')
         .addIntegerOption(option =>
             option.setName('electionid')
@@ -28,6 +24,11 @@ module.exports = {
                 .setDescription('The role the candidate is campaigning for')
                 .setRequired(true)),
     async execute(interaction) {
+
+        // added this block inside the execute function because I don't want it to execute if the command hasn't been run
+        const contractData = JSON.parse(fs.readFileSync("../contracts/build/ballot.json"));
+        const contract = new ethers.Contract(contractAddress, contractData.abi, wallet); 
+
         const electionID = interaction.options.getInteger('electionid');
         const username = interaction.options.getString('username');
         const role = interaction.options.getString('role');

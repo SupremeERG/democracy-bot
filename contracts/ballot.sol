@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.26;
 
 contract Ballot {
     struct Voter {
@@ -8,7 +8,6 @@ contract Ballot {
     struct Candidate {
         int electionID;
         string username; // discord username
-        string role; // the role they are campaigning for
         int votes; // number of votes the user has
     }
     struct Election {
@@ -34,9 +33,7 @@ contract Ballot {
         uint duration,
         uint endTime
     );
-    // Change -------> Another capital
     event ElectionEnded(string winner, string role, uint duration);
-    // Added ----> Event added
     event CandidateAdded(int electionID, string username);
 
     function startElection(string memory initiator, string memory role, uint duration) public {
@@ -47,20 +44,17 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
-        // Removed ----> elections[electionID];
         elections[electionID].initiator = initiator;
         elections[electionID].role = role;
 
-        // Changed -----> Added capital
         emit ElectionInitiated(electionID, initiator, role, duration, endTime);
     }
 
     // Added ----> Changed function name to suit more of the role IMO / Chnage back if you wish
-    function addCandidate(int electionID, string memory username, string memory role) public {
+    function addCandidate(int electionID, string memory username) public {
         Candidate memory newCandidate = Candidate({
             electionID: electionID,
             username: username,
-            role: role,
             votes: 0
         });
 

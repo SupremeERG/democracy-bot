@@ -1,19 +1,19 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { ethers } = require('ethers');
+const fs = require("node:fs");
 require('dotenv').config();
 
-const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
+const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
 const privateKey = process.env.PRIVATE_KEY;
 const wallet = new ethers.Wallet(privateKey, provider);
 const contractAddress = process.env.CONTRACT_ADDRESS;
-const abi = [
-    // contract ABI
-];
-const contract = new ethers.Contract(contractAddress, abi, wallet);
+const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"))
+
+const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('startElection')
+        .setName('create_election')
         .setDescription('Starts a new election.')
         .addStringOption(option =>
             option.setName('initiator')
