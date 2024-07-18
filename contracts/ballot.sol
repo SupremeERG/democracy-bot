@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.26;
+pragma solidity ^0.8.19;
 
 contract Ballot {
     struct Voter {
@@ -14,14 +14,11 @@ contract Ballot {
     struct Election {
         string initiator;
         string role;
-        Voter[] voters;
-        Candidate[] candidates;
-
+        Voter[] voters;//mapping(string username => Voter) voters;
+        Candidate[] candidates;//mapping(string username => Candidate) candidates;
     }
 
     mapping(int electionID => Election electionObject) elections;
-    Voter[] voters;
-    Candidate[] candidates;
 
 
 
@@ -45,7 +42,9 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
-        elections[electionID] = Election(initiator, role, voters, candidates);
+        elections[electionID];
+        elections[electionID].initiator = initiator;
+        elections[electionID].role = role;
 
         emit electionInitiated(electionID, initiator, role, duration, endTime);
     }
