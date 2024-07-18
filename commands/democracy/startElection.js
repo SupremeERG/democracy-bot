@@ -12,7 +12,7 @@ const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"))
 const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
 
 module.exports = {
-    enabled: false,
+    enabled: true,
     data: new SlashCommandBuilder()
         .setName('create_election')
         .setDescription('Starts a new election.')
@@ -34,7 +34,7 @@ module.exports = {
         const duration = interaction.options.getInteger('duration');
 
         try {
-            const tx = await contract.startElection(initiator, role, duration);
+            const tx = await contract.startElection(interaction.guildId, initiator, role, duration);
             await tx.wait();
             await interaction.reply(`Election started by ${initiator} for role ${role} with duration ${duration} seconds.`);
         } catch (error) {

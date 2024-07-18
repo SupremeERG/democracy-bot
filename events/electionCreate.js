@@ -8,7 +8,21 @@ const { ethers } = require("ethers");
 
 
 module.exports = {
-    name: "",
+    name: "ElectionInitiated",
     type: "contract",
-    async execute() {}
+    async execute(client, electionID, guildID, initiator, duration, endTime) {
+        // Having some troubles with this one :|
+        /*
+        let eID = electionID._hex;
+        console.log(`election ${eID} creatd in ${guildID}`);
+
+        const guild = client.guilds.fetch(guildID);
+        console.log(guild.name)
+        console.log(guild.channels)
+        
+        let electionChannel = guild.channels.cache.find((channel) => channel.name == "elections");
+
+        electionChannel.send("New election: " + `${eID}\n${initiatior}\n${duration}\n${endTime}`)
+        */
+    }
 }

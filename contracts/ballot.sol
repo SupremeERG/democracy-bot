@@ -10,6 +10,7 @@ contract Ballot {
         int votes; // number of votes the user has
     }
     struct Election {
+        int guildID;
         string initiator;
         string role;
         Voter[] voters; //mapping(string username => Voter) voters;
@@ -24,6 +25,7 @@ contract Ballot {
 
     event ElectionInitiated(  
         int electionID,
+        int guildID,
         string owner,
         string role,
         uint duration,
@@ -32,7 +34,7 @@ contract Ballot {
     event ElectionEnded(string winner, string role, uint duration);
     event CandidateAdded(int electionID, string username);
 
-    function startElection(string memory initiator, string memory role, uint duration) public {
+    function startElection(int guildID, string memory initiator, string memory role, uint duration) public {
         // this starts the election where users can join to campaign
 
         int electionID = int(uint(keccak256(abi.encodePacked(initiator, role, duration))));
@@ -40,10 +42,11 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
+        elections[electionID].guildID = guildID;
         elections[electionID].initiator = initiator;
         elections[electionID].role = role;
 
-        emit ElectionInitiated(electionID, initiator, role, duration, endTime);
+        emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
     }
 
     function addCandidate(int electionID, string memory username) public {
@@ -62,7 +65,7 @@ contract Ballot {
     }
 
     // Added ----> Return types and had to make public
-    function getResults(int electionID) public view returns (string memory winner, mapping(string candidate => int votes)) {
+    function getResults(int electionID) public view returns (string memory winner, Election memory electionTurnout) {
         // this function should only return the winning user as well as vote statistics
         // the discord bot should handle all roles and administration
     }

@@ -5,7 +5,7 @@ const { Web3 } = require("web3");
 const { ethers, ContractFactory, Wallet } = require("ethers");
 
 module.exports = {
-    enabled: false,
+    enabled: true,
     cooldown: 60,
     data: new SlashCommandBuilder()
         .setName('deploy')
@@ -23,7 +23,7 @@ module.exports = {
         // If your contract requires constructor args, you can specify them here
         const contract = await factory.deploy();
         
-
+        // TODO: REWRITE CONTRACT ADDRESS SOMEWHERE (preferably .env AND ALLOW THE APPLICATION TO REFRESH THE VALUE
         await interaction.editReply(`The contract was deployed at ${contract.address}`)
     },
 };
