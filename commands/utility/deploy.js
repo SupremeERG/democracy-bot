@@ -5,6 +5,7 @@ const { Web3 } = require("web3");
 const { ethers, ContractFactory, Wallet } = require("ethers");
 
 module.exports = {
+    enabled: false,
     cooldown: 60,
     data: new SlashCommandBuilder()
         .setName('deploy')

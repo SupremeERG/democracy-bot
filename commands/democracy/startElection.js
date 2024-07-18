@@ -12,6 +12,7 @@ const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"))
 const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
 
 module.exports = {
+    enabled: false,
     data: new SlashCommandBuilder()
         .setName('create_election')
         .setDescription('Starts a new election.')

@@ -37,6 +37,7 @@ module.exports = {
 			timestamps.set(interaction.user.id, now);
 			setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
+			if (command.enabled != null && command.enabled == false) return interaction.reply("Sorry, this command is disabled.");
 			await command.execute(interaction);
 		} catch (error) {
 			console.error(error);
