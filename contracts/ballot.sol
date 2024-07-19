@@ -3,41 +3,41 @@ pragma solidity ^0.8.26;
 
 contract Ballot {
     struct Voter {
-        string username; // discord username
+        string user; // discord user
     }
     struct Candidate {
-        string username; // discord username
-        int votes; // number of votes the user has
+        string user; // discord user
+        uint votes; // number of votes the user has
     }
     struct Election {
-        int guildID;
+        uint guildID;
         string initiator;
         string role;
-        Voter[] voters; //mapping(string username => Voter) voters;
-        Candidate[] candidates; //mapping(string username => Candidate) candidates;
+        Voter[] voters; //mapping(string user => Voter) voters;
+        Candidate[] candidates; //mapping(string user => Candidate) candidates;
     }
 
-    mapping(int electionID => Election electionObject) elections;
+    mapping(uint electionID => Election electionObject) public elections;
 
     // owner = election initiator
     // role = the role the election is held for
     // duration = the amount of time the election is running
 
     event ElectionInitiated(  
-        int electionID,
-        int guildID,
+        uint electionID,
+        uint guildID,
         string owner,
         string role,
         uint duration,
         uint endTime
     );
     event ElectionEnded(string winner, string role, uint duration);
-    event CandidateAdded(int electionID, string username);
+    event CandidateAdded(uint electionID, string user);
 
-    function startElection(int guildID, string memory initiator, string memory role, uint duration) public {
+    function startElection(uint guildID, string memory initiator, string memory role, uint duration) public {
         // this starts the election where users can join to campaign
 
-        int electionID = int(uint(keccak256(abi.encodePacked(initiator, role, duration))));
+        uint electionID = uint(keccak256(abi.encodePacked(initiator, role, duration)));
 
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
@@ -49,24 +49,25 @@ contract Ballot {
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
     }
 
-    function addCandidate(int electionID, string memory username) public {
+    function addCandidate(uint electionID, string memory user) public {
         Candidate memory newCandidate = Candidate({
-            username: username,
+            user: user,
             votes: 0
         });
 
         elections[electionID].candidates.push(newCandidate);
 
-        emit CandidateAdded(electionID, username);
+        emit CandidateAdded(electionID, user);
     }
 
-    function vote(int electionID, string memory username) public {
+    function vote(uint electionID, string memory user) public {
         // Voting logic
     }
 
     // Added ----> Return types and had to make public
-    function getResults(int electionID) public view returns (string memory winner, Election memory electionTurnout) {
+    function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
         // this function should only return the winning user as well as vote statistics
         // the discord bot should handle all roles and administration
     }
+
 }
