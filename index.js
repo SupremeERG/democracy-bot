@@ -18,5 +18,6 @@ const contract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractData.
 
 eventHandler.listen(client, contract)
 
+
 client.login(process.env.BOT_TOKEN);
 

@@ -12,17 +12,14 @@ module.exports = {
     type: "contract",
     async execute(client, electionID, guildID, initiator, duration, endTime) {
         // Having some troubles with this one :|
-        /*
+        if (guildID != process.env.guildID) return console.log("thats the problem");
         let eID = electionID._hex;
-        console.log(`election ${eID} creatd in ${guildID}`);
+        console.log(`election ${eID} created in ${guildID}`);
 
-        const guild = client.guilds.fetch(guildID);
-        console.log(guild.name)
-        console.log(guild.channels)
-        
+        const guild = client.guilds.cache.find(guild => guild.id == guildID);
+
         let electionChannel = guild.channels.cache.find((channel) => channel.name == "elections");
 
-        electionChannel.send("New election: " + `${eID}\n${initiatior}\n${duration}\n${endTime}`)
-        */
+        electionChannel.send("New election: " + `${eID}\n${initiator}\n${duration}\n${endTime}`)
     }
 }
