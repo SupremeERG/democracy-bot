@@ -1,6 +1,6 @@
 {
-    "contractAddress": "",
-    "rpcEndpoint": "http://localhost:8545",
-    "guildID": "",
-    "clientID": ""
+  "rpcEndpoint": "http://localhost:8545",
+  "guildID": "",
+  "clientID": "",
+  "contractAddress": "0x4ed7c70F96B99c776995fB64377f0d4aB3B0e1C1"
 }

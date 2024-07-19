@@ -3,7 +3,7 @@ const { Events, Collection } = require('discord.js');
 module.exports = {
 	name: Events.InteractionCreate,
 	type: "discord",
-	async execute(interaction) {
+	async execute(client, interaction) {
 		const { cooldowns } = interaction.client;
 
 
@@ -39,7 +39,7 @@ module.exports = {
 			setTimeout(() => timestamps.delete(interaction.user.id), cooldownAmount);
 
 			if (command.enabled != null && command.enabled == false) return interaction.reply("Sorry, this command is disabled.");
-			await command.execute(interaction);
+			await command.execute(client, interaction);
 		} catch (error) {
 			console.error(error);
 			if (interaction.replied || interaction.deferred) {

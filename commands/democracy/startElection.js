@@ -2,11 +2,11 @@ const { SlashCommandBuilder } = require('discord.js');
 const { ethers } = require('ethers');
 const fs = require("node:fs");
 require('dotenv').config();
-
-const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
+const appConfig = require("../../config.json")
+const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
 const privateKey = process.env.PRIVATE_KEY;
 const wallet = new ethers.Wallet(privateKey, provider);
-const contractAddress = process.env.CONTRACT_ADDRESS;
+const contractAddress = appConfig.contractAddress;
 const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"))
 
 const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
@@ -24,7 +24,7 @@ module.exports = {
             option.setName('duration')
                 .setDescription('The duration of the election in seconds')
                 .setRequired(true)),
-    async execute(interaction) {
+    async execute(client, interaction) {
         await interaction.deferReply({ ephemeral: true });
 
         const initiator = interaction.user.id;
@@ -39,7 +39,7 @@ module.exports = {
             await tx.wait();
 
             interaction.editReply(`Election started.`);
-            await interaction.channel.send(`Election started by <@${initiator}> for role <#${role.id}> with duration ${duration} seconds.`);
+            await interaction.channel.send(`Election started by <@${initiator}> for role <@&${role.id}> with duration ${duration} seconds.`);
         } catch (error) {
             console.error(error);
             await interaction.editReply('Error starting election.');

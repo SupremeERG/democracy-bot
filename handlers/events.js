@@ -1,12 +1,12 @@
 const path = require("node:path");
 const fs = require("node:fs");
-
+const {ethers} = require("ethers");
 const eventsPath = path.join(__dirname, '../events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+const appConfig = require("../config.json");
 
 module.exports = {
     listen: async function (client, contract) {
-        console.log("Started listener")
         let startBlockNumber = await contract.provider.getBlockNumber();
 
         for (const file of eventFiles) {
@@ -31,9 +31,9 @@ module.exports = {
                 }
             } else if (event.type == "discord") {
                 if (event.once) {
-                    client.once(event.name, (...args) => event.execute(...args));
+                    client.once(event.name, (...args) => event.execute(client, ...args));
                 } else {
-                    client.on(event.name, (...args) => event.execute(...args));
+                    client.on(event.name, (...args) => event.execute(client, ...args));
                 }
             } else {
                 console.error("No event type was declared in " + filePath);
@@ -45,11 +45,11 @@ module.exports = {
         contract.removeAllListeners();
 
         const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"));
-        const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_ENDPOINT);
+        const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
         const defaultAccount = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-        const freshContract = new ethers.Contract(process.env.CONTRACT_ADDRESS, contractData.abi, defaultAccount)
-
+        const freshContract = new ethers.Contract(appConfig.contractAddress, contractData.abi, defaultAccount)
+        
         this.listen(client, freshContract);
-        console.log("restarted listener with new contract data");
+        console.log("Listener restarted")
     }
 }
