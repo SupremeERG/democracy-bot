@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.26;
 
+import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
+
+
 contract Ballot {
     struct Voter {
         string user; // discord user
@@ -54,7 +57,7 @@ contract Ballot {
 
         elections[electionID].candidates[user] = 0;
 
-        emit CandidateAdded(electionID, string(elections[electionID].candidates[user]));
+        emit CandidateAdded(electionID, Strings.toString(elections[electionID].candidates[user]));
     }
 
     function vote(uint electionID, string memory user) public {

@@ -7,11 +7,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "nodemonConfig": {
-    "ignore": ["config.json"]
+    "ignore": [
+      "config.json"
+    ]
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "ethers": "^5.7.2",
