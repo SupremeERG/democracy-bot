@@ -7,6 +7,7 @@ import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
 contract Ballot {
     struct Voter {
         string user; // discord user
+        bool voted;
     }
     struct Candidate {
         string user; // discord user
@@ -16,11 +17,11 @@ contract Ballot {
         uint guildID;
         string initiator;
         string role;
-        mapping(string user => string candidate) voter;
-        mapping(string user => uint votes) candidates;
     }
 
-    mapping(uint electionID => Election electionObject) public elections;
+    mapping(uint electionID => Election electionObject) private elections;
+    mapping(uint electionID => Voter[] voters) private voters;
+    mapping(uint electionID => Candidate[] candidates) private candidates;
 
     // owner = election initiator
     // role = the role the election is held for
@@ -50,19 +51,22 @@ contract Ballot {
         elections[electionID].initiator = initiator;
         elections[electionID].role = role;
 
+
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
     }
 
     function addCandidate(uint electionID, string calldata user) public {
 
-        elections[electionID].candidates[user] = 0;
+        candidates[electionID].push(user, 0);
 
-        emit CandidateAdded(electionID, Strings.toString(elections[electionID].candidates[user]));
+        emit CandidateAdded(electionID, user);
     }
 
     function vote(uint electionID, string memory user) public {
         // Voting logic
     }
+
+    function getElection() public returns (Election, Voter[], Candidate[]) {}
 
     // Added ----> Return types and had to make public
     /*
