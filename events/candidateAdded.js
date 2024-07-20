@@ -24,6 +24,7 @@ module.exports = {
         let election = await contract.elections(electionID);
         let user = client.guilds.cache.get(`${election.guildID}`).members.cache.get(candidateID).user
 
+        console.log(election.candidates, user.username)
         
 
 

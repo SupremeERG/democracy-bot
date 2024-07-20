@@ -13,8 +13,8 @@ contract Ballot {
         uint guildID;
         string initiator;
         string role;
-        Voter[] voters; //mapping(string user => Voter) voters;
-        Candidate[] candidates; //mapping(string user => Candidate) candidates;
+        mapping(string user => string candidate) voter;
+        mapping(string user => uint votes) candidates;
     }
 
     mapping(uint electionID => Election electionObject) public elections;
@@ -42,6 +42,7 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
+
         elections[electionID].guildID = guildID;
         elections[electionID].initiator = initiator;
         elections[electionID].role = role;
@@ -49,15 +50,11 @@ contract Ballot {
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
     }
 
-    function addCandidate(uint electionID, string memory user) public {
-        Candidate memory newCandidate = Candidate({
-            user: user,
-            votes: 0
-        });
+    function addCandidate(uint electionID, string calldata user) public {
 
-        elections[electionID].candidates.push(newCandidate);
+        elections[electionID].candidates[user] = 0;
 
-        emit CandidateAdded(electionID, user);
+        emit CandidateAdded(electionID, string(elections[electionID].candidates[user]));
     }
 
     function vote(uint electionID, string memory user) public {
@@ -65,9 +62,10 @@ contract Ballot {
     }
 
     // Added ----> Return types and had to make public
+    /*
     function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
         // this function should only return the winning user as well as vote statistics
         // the discord bot should handle all roles and administration
-    }
+    }*/
 
 }
