@@ -6,10 +6,6 @@ const appConfig = require("../config.json")
 const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
 const privateKey = process.env.PRIVATE_KEY;
 
-function convert(hexValue) {
-    return parseInt(hexValue, 16)
-}
-
 module.exports = {
     name: "CandidateAdded",
     type: "contract",

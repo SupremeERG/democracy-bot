@@ -55,6 +55,7 @@ contract Ballot {
     }
 
     function addCandidate(uint electionID, uint user) public {
+
         require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
 
         candidates[electionID].push(Candidate(user, 0));
@@ -68,21 +69,21 @@ contract Ballot {
 
     function verifyElection(uint electionID) internal view returns (bool) {
         Election memory election = elections[electionID];
-        if(election.active != true) {
+        if(election.active == false) {
             return false;
         } else {
             return true;
         }
     }
 
-    function getElection(uint electionID) public view returns (Election memory) {//(Election memory, Voter[] memory, Candidate[] memory) {
-        
+    function getElection(uint electionID) public view returns (Election memory, Voter[] memory, Candidate[] memory) {
         
         require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
-        /*Voter[] memory electionVoters = voters[electionID];
-        Candidate[] memory electionCandidates = candidates[electionID];*/
+        
+        Voter[] memory electionVoters = voters[electionID];
+        Candidate[] memory electionCandidates = candidates[electionID];
 
-        return elections[electionID];//(elections[electionID], voters[electionID], candidates[electionID]);
+        return (elections[electionID], electionVoters, electionCandidates);
     }
 
     // Added ----> Return types and had to make public
