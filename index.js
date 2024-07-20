@@ -21,4 +21,3 @@ eventHandler.listen(client, contract)
 
 
 client.login(process.env.BOT_TOKEN);
-

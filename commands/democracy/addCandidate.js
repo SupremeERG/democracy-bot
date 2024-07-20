@@ -30,8 +30,9 @@ module.exports = {
 
         //let member = client.guilds.cache.get() // I have to fetch guild from election object
 
-        let election = await contract.elections(electionID);
-        if (election["guildID"]._hex == "0x00" && election["initiator"] == "" && election["role"] == "") return await interaction.editReply(`I could not find an election by the ID of ${electionID}`)
+        let election = await contract.getElection(electionID);
+
+        //if (election["guildID"]._hex == "0x00" && election["initiator"] == "" && election["role"] == "") return await interaction.editReply(`I could not find an election by the ID of ${electionID}`)
 
         try {
             const tx = await contract.addCandidate(electionID, user.id);
@@ -40,7 +41,7 @@ module.exports = {
             await interaction.editReply(`Candidate <@${user.id}> added to election ${electionID}.`);
         } catch (error) {
             console.error(error);
-            await interaction.reply('Error adding candidate.');
+            await interaction.editReply('Error adding candidate.');
         }
     },
 };

@@ -23,7 +23,7 @@ module.exports = {
                 } else {
                     // logic for event listening
                     contract.on(event.name, async (...args) => {
-                        if (args[args.length - 1].blockNumber <= startBlockNumber) return // stops the bot from executing on existing blockchain events
+                        if (args[args.length - 1].blockNumber <= startBlockNumber) return; // stops the bot from executing on existing blockchain events
 
                         event.execute(client, ...args);
                     })

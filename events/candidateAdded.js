@@ -21,7 +21,7 @@ module.exports = {
         const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
 
         
-        let election = await contract.elections(electionID);
+        let election = await contract.getElection(electionID);
         //let user = client.guilds.cache.get(`${election.guildID}`).members.cache.get(candidateID).user
 
         console.log(election)

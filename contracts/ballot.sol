@@ -6,22 +6,23 @@ import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
 contract Ballot {
     struct Voter {
-        string user; // discord user
+        uint user; // discord user
         bool voted;
     }
     struct Candidate {
-        string user; // discord user
+        uint user; // discord user
         uint votes; // number of votes the user has
     }
     struct Election {
+        bool active;
         uint guildID;
-        string initiator;
-        string role;
+        uint initiator;
+        uint role;
     }
 
     mapping(uint electionID => Election electionObject) private elections;
-    mapping(uint electionID => Voter[] voters) private voters;
-    mapping(uint electionID => Candidate[] candidates) private candidates;
+    mapping(uint electionID => Voter[]) private voters;
+    mapping(uint electionID => Candidate[]) private candidates;
 
     // owner = election initiator
     // role = the role the election is held for
@@ -30,15 +31,15 @@ contract Ballot {
     event ElectionInitiated(  
         uint electionID,
         uint guildID,
-        string owner,
-        string role,
+        uint owner,
+        uint role,
         uint duration,
         uint endTime
     );
-    event ElectionEnded(string winner, string role, uint duration);
-    event CandidateAdded(uint electionID, string user);
+    event ElectionEnded(uint winner, uint role, uint duration);
+    event CandidateAdded(uint electionID, uint user);
 
-    function startElection(uint guildID, string memory initiator, string memory role, uint duration) public {
+    function startElection(uint guildID, uint initiator, uint role, uint duration) public {
         // this starts the election where users can join to campaign
 
         uint electionID = uint(keccak256(abi.encodePacked(initiator, role, duration)));
@@ -47,17 +48,16 @@ contract Ballot {
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
 
-        elections[electionID].guildID = guildID;
-        elections[electionID].initiator = initiator;
-        elections[electionID].role = role;
+        elections[electionID] = Election(true, guildID, initiator, role);
 
 
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
     }
 
-    function addCandidate(uint electionID, string calldata user) public {
+    function addCandidate(uint electionID, uint user) public {
+        require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
 
-        candidates[electionID].push(user, 0);
+        candidates[electionID].push(Candidate(user, 0));
 
         emit CandidateAdded(electionID, user);
     }
@@ -66,7 +66,24 @@ contract Ballot {
         // Voting logic
     }
 
-    function getElection() public returns (Election, Voter[], Candidate[]) {}
+    function verifyElection(uint electionID) internal view returns (bool) {
+        Election memory election = elections[electionID];
+        if(election.active != true) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    function getElection(uint electionID) public view returns (Election memory) {//(Election memory, Voter[] memory, Candidate[] memory) {
+        
+        
+        require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
+        /*Voter[] memory electionVoters = voters[electionID];
+        Candidate[] memory electionCandidates = candidates[electionID];*/
+
+        return elections[electionID];//(elections[electionID], voters[electionID], candidates[electionID]);
+    }
 
     // Added ----> Return types and had to make public
     /*
