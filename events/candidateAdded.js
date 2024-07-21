@@ -18,10 +18,17 @@ module.exports = {
 
         
         let election = await contract.getElection(electionID);
-        //let user = client.guilds.cache.get(`${election.guildID}`).members.cache.get(candidateID).user
+        election = {
+            id: electionID._hex,
+            active: election[0].active,
+            guildID: `${election[0].guildID}`,
+            initiator: `${election[0].initiator}`,
+            role: `${election[0].role}`,
+            voters: election[1],
+            candidates: election[2]
+        };
 
-        console.log(election)
-        
+        let user = client.guilds.cache.get(election.guildID).members.cache.get(`${candidateID}`).user;        
 
 
 
