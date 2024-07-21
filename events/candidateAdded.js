@@ -1,4 +1,5 @@
 // Event triggers user is added to election in smart contract.
+// https://github.com/ethers-io/ethers.js/discussions/3027 << Error handling issue
 const { ethers } = require('ethers');
 const fs = require("node:fs");
 require('dotenv').config();
@@ -16,8 +17,10 @@ module.exports = {
         const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"));
         const contract = new ethers.Contract(contractAddress, contractData.abi, wallet);
 
-        
+
         let election = await contract.getElection(electionID);
+
+
         election = {
             id: electionID._hex,
             active: election[0].active,
@@ -28,7 +31,7 @@ module.exports = {
             candidates: election[2]
         };
 
-        let user = client.guilds.cache.get(election.guildID).members.cache.get(`${candidateID}`).user;        
+        let user = client.guilds.cache.get(election.guildID).members.cache.get(`${candidateID}`).user;
 
 
 

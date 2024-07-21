@@ -20,26 +20,27 @@ module.exports = {
             option.setName('role')
                 .setDescription('The role the election is for')
                 .setRequired(true))
-        .addIntegerOption(option =>
+        .addStringOption(option =>
             option.setName('duration')
-                .setDescription('The duration of the election in seconds')
+                .setDescription('The duration of the election in hours')
                 .setRequired(true)),
     async execute(client, interaction) {
         await interaction.deferReply({ ephemeral: true });
 
         const initiator = interaction.user.id;
         let roleName = interaction.options.getString('role');
-        const duration = interaction.options.getInteger('duration');
+        const duration = interaction.options.getString('duration');
+
+        if (isNaN(duration)) return interaction.editReply("You need to supply a number for `duration`.")
 
         let role = interaction.guild.roles.cache.find(guildRole => guildRole.name == roleName);
         if (!role) return interaction.editReply(`The role "${roleName}" could not be found. Try again with the correct role name.`);
 
         try {
-            const tx = await contract.startElection(interaction.guildId, initiator, role.id, duration);
+            const tx = await contract.startElection(interaction.guildId, initiator, role.id, Math.floor(duration * 60 * 60));
             await tx.wait();
 
             interaction.editReply(`Election started.`);
-            await interaction.channel.send(`Election started by <@${initiator}> for role <@&${role.id}> with duration ${duration} seconds.`);
         } catch (error) {
             console.error(error);
             await interaction.editReply('Error starting election.');

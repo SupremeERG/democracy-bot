@@ -1,23 +1,49 @@
-/* this component will listen for the electionInitiated -- or whatever its called -- event
-when it runs, it should send a message to a dedicated channel saying an election starting
-but I am still afraid there might be errors with the election object storage so I want to worry about
-adding candidates tomorrow*/
+const { Embed, EmbedBuilder } = require("discord.js");
 
+function calculateTime(time) {
+    if (isNaN(time)) throw "Integer not given for \"time\" parameter";
+    if (time / 60 < 1) return [time, "seconds"] 
+    else if (time / (60 * 60) < 1) return [Math.round(time / (60)), "minutes"]
+    else if (time / (60 * 60 * 60) < 1) return [Math.round(time / (60 * 60)), "hours"]
+    else if (time / (60 * 60 * 24) < 1) return [Math.round(time / (60 * 60 * 24)), "days"]
+    else return [Math.round(time / (60 * 60 * 24 * 7)), "weeks"]
+}
 
-const { ethers } = require("ethers");
+function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+}
 
 
 module.exports = {
     name: "ElectionInitiated",
     type: "contract",
-    async execute(client, electionID, guildID, initiator, duration, endTime) {
+    async execute(client, electionID, guildID, initiator, role, duration, endTime) {
 
-        let eID = electionID._hex;
+        let eID = electionID._hex// Converting BigInt to String also converts the number to regular number
         console.log(`election ${eID} created in ${guildID}`);
 
-        const guild = client.guilds.cache.find(guild => guild.id == guildID);
+        const guild = client.guilds.cache.find(guild => guild.id == `${guildID}`);
         let electionChannel = guild.channels.cache.find((channel) => channel.name == "elections");
 
-        electionChannel.send("New election: " + `${eID}\n<@${initiator}>\n${duration}\n${endTime}`)
+        let [calculatedDuration, timeUnit] = calculateTime(`${duration}`);
+
+        const embed = new EmbedBuilder()
+            .setColor(getRandomColor())
+            .setTitle("New Election")
+            .setFields(
+                { name: "Election ID", value: eID },
+                { name: "Position", value: `<@&${role}>` },
+                { name: "Started by", value: `<@${initiator}>` },
+                { name: "Duration", value: `${calculatedDuration} ${timeUnit}`, inline: true },
+                { name: "Ends", value: `<t:${endTime}>`, inline: true },
+            )
+            .setFooter({ text: "Join the candidacy with /join_candidacy or Vote with /vote"})
+
+        electionChannel.send({ embeds: [embed] })
     }
 }

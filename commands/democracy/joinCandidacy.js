@@ -13,7 +13,7 @@ const contractAddress = appConfig.contractAddress;
 module.exports = {
     enabled: true,
     data: new SlashCommandBuilder()
-        .setName('add_candidate')
+        .setName('join_candidacy')
         .setDescription('Adds a candidate to an election.')
         .addStringOption(option =>
             option.setName('electionid')
@@ -28,11 +28,6 @@ module.exports = {
         const electionID = interaction.options.getString('electionid');
         const user = interaction.user
 
-        //let member = client.guilds.cache.get() // I have to fetch guild from election object
-
-        let election = await contract.getElection(electionID);
-
-        //if (election["guildID"]._hex == "0x00" && election["initiator"] == "" && election["role"] == "") return await interaction.editReply(`I could not find an election by the ID of ${electionID}`)
 
         try {
             const tx = await contract.addCandidate(electionID, user.id);
@@ -40,7 +35,8 @@ module.exports = {
 
             await interaction.editReply(`Candidate <@${user.id}> added to election ${electionID}.`);
         } catch (error) {
-            console.error(error);
+            let parsedError = contract.interface.parseError(error.error.error.error.data.data);
+            if (parsedError.name == "InvalidElectionID") return await interaction.editReply("You entered an invalid election ID. Please make sure you entered the electionID of an active election.")
             await interaction.editReply('Error adding candidate.');
         }
     },
