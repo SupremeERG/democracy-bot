@@ -3,6 +3,7 @@ pragma solidity ^0.8.26;
 
 import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
+error InvalidElectionID(uint electionID);
 
 contract Ballot {
     struct Voter {
@@ -56,7 +57,7 @@ contract Ballot {
 
     function addCandidate(uint electionID, uint user) public {
 
-        require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
+        if(verifyElection(electionID) != true) revert InvalidElectionID(electionID);
 
         candidates[electionID].push(Candidate(user, 0));
 
@@ -78,7 +79,7 @@ contract Ballot {
 
     function getElection(uint electionID) public view returns (Election memory, Voter[] memory, Candidate[] memory) {
         
-        require(verifyElection(electionID) == true, string.concat("Election ", string.concat(Strings.toString(electionID), " could not be found")));
+        if(verifyElection(electionID) != true) revert InvalidElectionID(electionID);
         
         Voter[] memory electionVoters = voters[electionID];
         Candidate[] memory electionCandidates = candidates[electionID];
