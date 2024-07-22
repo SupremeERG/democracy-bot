@@ -34,6 +34,5 @@ module.exports = {
         let user = client.guilds.cache.get(election.guildID).members.cache.get(`${candidateID}`).user;
 
 
-
     }
 }

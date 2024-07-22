@@ -43,7 +43,7 @@ module.exports = {
     restartListener: async function (client, contract) {
         client.removeAllListeners();
         await contract.removeAllListeners();
-
+        
         const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"));
         const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
         const defaultAccount = new ethers.Wallet(process.env.PRIVATE_KEY, provider);

@@ -14,6 +14,7 @@ Create a discord democracy where users vote and elect roles with a discord bot t
 - end election automatically after end time
 - automatically replace previously elected officials after new election if wanted
 - User chooses dedicated election channel where elections/results are announced
+- User can always view ballot with a command
 
 # Todo
 
@@ -25,3 +26,4 @@ Create a discord democracy where users vote and elect roles with a discord bot t
 - [ ] choose election channel command
 - [ ] end election automatically after end time
 - [ ] end election prematurely
+- [ ] Create a function to view ballot candidates
