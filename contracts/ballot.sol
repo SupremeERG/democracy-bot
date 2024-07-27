@@ -60,9 +60,11 @@ contract Ballot {
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
 
-        elections[electionID] = Election(true, guildID, initiator, role);
+        elections[electionID] = Election(true, guildID, initiator, role, duration, endTime);
 
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
+
+        watch(electionID);
     }
 
     function addCandidate(uint electionID, uint user) public {
@@ -104,7 +106,7 @@ contract Ballot {
 
     function verifyElection(uint electionID) internal view returns (bool) {
         Election memory election = elections[electionID];
-        if (election.active == false) {
+        if (election.active == false && election.initiator == 0) {
             return false;
         } else {
             return true;
@@ -128,20 +130,39 @@ contract Ballot {
         return (false, candidates[0][0]);
     }
 
-    function watch(uint electionID) internal {
+    function watch(uint electionID) internal view {
         // watches an election until it ends
-        election = elections[electionID];
-        endTime = election.endTime;
+        Election memory election = elections[electionID];
 
-        while (block.timestamp < endTime) {}
+
+        while (block.timestamp < election.endTime) {}
         // now end the election here
+        election.active = false;
+
         
+        //emit ElectionEnded(winner, role, duration);
     }
 
-    // Added ----> Return types and had to make public
-    /*
+    function max(uint electionID, uint value) internal view {
+        /* this function should evaluate the highest value in a mapping 
+        by comparing an existing value with a new one and only
+         replacing the old variable with the existing value if the comparison (newVal > highestVal)
+         according to https://stackoverflow.com/questions/72091082/how-to-get-a-pair-with-the-highest-value-from-a-mapping#:~:text=Solidity%20mapping%20does%20not%20support,a%20new%20entry%20is%20added. 
+         */
+        
+        if (value == value) { // just a filler so I can compile without errors
+            revert InvalidElectionID(1);
+        }
+    }
+
+        /*
     function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
         // this function should only return the winning user as well as vote statistics
-        // the discord bot should handle all roles and administration
-    }*/
+        (Election memory election, Voter[] memory voters, Candidate[] memory candidate) = getElection(electionID);
+        uint winner;*/
+        
+
+
+        
+    }
 }
