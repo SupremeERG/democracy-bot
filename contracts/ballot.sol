@@ -19,6 +19,8 @@ contract Ballot {
         uint guildID;
         uint initiator; // election initiator
         uint role; // role = the position the election is held for
+        uint duration;
+        uint endTime;
     }
 
     mapping(uint electionID => Election electionObject) private elections;
@@ -53,7 +55,7 @@ contract Ballot {
     function startElection(uint guildID, uint initiator, uint role, uint duration) public {
         // this starts the election where users can join to campaign
 
-        uint electionID = uint(keccak256(abi.encodePacked(initiator, role, duration)));
+        uint electionID = uint(keccak256(abi.encodePacked(initiator, role, duration, block.timestamp)));
 
         uint startTime = block.timestamp;
         uint endTime = startTime + duration; // the discord bot can handle time logic
@@ -124,6 +126,16 @@ contract Ballot {
         }
 
         return (false, candidates[0][0]);
+    }
+
+    function watch(uint electionID) internal {
+        // watches an election until it ends
+        election = elections[electionID];
+        endTime = election.endTime;
+
+        while (block.timestamp < endTime) {}
+        // now end the election here
+        
     }
 
     // Added ----> Return types and had to make public

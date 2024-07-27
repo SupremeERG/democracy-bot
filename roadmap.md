@@ -20,7 +20,7 @@ Create a discord democracy where users vote and elect roles with a discord bot t
 
 - [x] Create election for role with an end time
 - [x] join candidacy function
-- [ ] get election stats
+- [ ] get election information
 - [ ] create voter registration function
 - [ ] create vote vunction
 - [ ] choose election channel command
