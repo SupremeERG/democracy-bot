@@ -1,6 +1,6 @@
 # Purpose
 
-This application is meant to be a learning tool, teaching me how to pragmatically and securely program decentralized applications (dapps) with Javascript and Solidity. Building and utilizing an application like this teaches one how data is programmatically stored on the blockchain and how the EVM communicates with smart contracts. I also hope to audit the smart contract for vulnerabilities as I am more interested in smart contract security than the development. This project is not much of a practical tool for discord users but rather a challenge for an ethical hacker with developer skills (me).
+This application is meant to be a learning tool teaching me how to pragmatically and securely program decentralized applications (dapps) with Javascript and Solidity. I also hope to audit the smart contract for vulnerabilities as I am more interested in smart contract security than the development. Building and utilizing an application like this teaches one how data is programmatically stored on the blockchain and how the EVM communicates with smart contracts. This project is not much of a practical tool for discord users but rather a challenge for an ethical hacker with developer skills (me).
 
 # Capabilites
 
