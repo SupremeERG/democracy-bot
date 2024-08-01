@@ -36,7 +36,7 @@ contract Ballot {
     event ElectionInitiated(
         uint electionID, uint guildID, uint owner, uint role, uint duration, uint endTime
     );
-    event ElectionEnded(uint winner, uint role, uint duration);
+    event ElectionEnded(uint electionID, uint winner, uint role, uint duration);
     event CandidateAdded(uint electionID, uint user);
     event VoterRegistered(uint electionID, uint user);
 
@@ -140,20 +140,22 @@ contract Ballot {
         election.active = false;
 
         
-        //emit ElectionEnded(winner, role, duration);
+        emit ElectionEnded(electionID, 0, 0, 0);
     }
 
-    function max(uint electionID, uint value) internal view {
+    /*
+    function max(uint electionID, uint value) internal pure {
         /* this function should evaluate the highest value in a mapping 
         by comparing an existing value with a new one and only
          replacing the old variable with the existing value if the comparison (newVal > highestVal)
          according to https://stackoverflow.com/questions/72091082/how-to-get-a-pair-with-the-highest-value-from-a-mapping#:~:text=Solidity%20mapping%20does%20not%20support,a%20new%20entry%20is%20added. 
-         */
+         I might have to add a max value property to the Election object
+         *./
         
-        if (value == value) { // just a filler so I can compile without errors
+        if (electionID == value) { // just a filler so I can compile without errors
             revert InvalidElectionID(1);
         }
-    }
+    }*/
 
         /*
     function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
@@ -164,5 +166,4 @@ contract Ballot {
 
 
         
-    }
 }
