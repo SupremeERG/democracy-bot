@@ -139,19 +139,33 @@ contract Ballot {
         return (false, candidates[0][0]);
     }
 
-    /*
-    function max(uint electionID, uint value) internal pure {
+    
+    function max(uint electionID, uint newValue) internal pure {
         /* this function should evaluate the highest value in a mapping 
         by comparing an existing value with a new one and only
          replacing the old variable with the existing value if the comparison (newVal > highestVal)
          according to https://stackoverflow.com/questions/72091082/how-to-get-a-pair-with-the-highest-value-from-a-mapping#:~:text=Solidity%20mapping%20does%20not%20support,a%20new%20entry%20is%20added. 
          I might have to add a max value property to the Election object
-         *./
+         */
+        election = getElection(electionID);
+        currentMaxVal = election.maxVoteCount;
+
+        /* PROBLEM WITH THIS ALGORITHM: election.maxVoteCount is an integer. There is no
+        inexpensive way to fetch the corresponding user to this maxVoteCount unless I make maxVoteCount
+        some type of object that will contain the user with the highest amount of votes as well as
+        the amount of votes they have.
         
+        Possible solution: array with index 0 being the voter, and index 1 being the amount of votes they have
+        */
+
+        if (newValue > currentMaxVal) {
+            election.maxVoteCount = newValue;
+        }
         if (electionID == value) { // just a filler so I can compile without errors
             revert InvalidElectionID(1);
         }
-    }*/
+
+    }
 
         /*
     function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
