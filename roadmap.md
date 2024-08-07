@@ -24,6 +24,6 @@ Create a discord democracy where users vote and elect roles with a discord bot t
 - [ ] create voter registration function
 - [ ] create vote vunction
 - [ ] choose election channel command
-- [ ] end election automatically after end time
+- [x] end election automatically after end time
 - [ ] end election prematurely
 - [ ] Create a function to view ballot candidates
