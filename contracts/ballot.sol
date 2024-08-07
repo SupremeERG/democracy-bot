@@ -63,8 +63,17 @@ contract Ballot {
         elections[electionID] = Election(true, guildID, initiator, role, duration, endTime);
 
         emit ElectionInitiated(electionID, guildID, initiator, role, duration, endTime);
+    }
 
-        watch(electionID);
+    function endElection(uint electionID) public {
+        // watches an election until it ends
+        Election storage election = elections[electionID];
+
+        // sets the election inactive
+        election.active = false;
+
+        
+        emit ElectionEnded(electionID, 0, 0, 0); // filler data
     }
 
     function addCandidate(uint electionID, uint user) public {
@@ -128,19 +137,6 @@ contract Ballot {
         }
 
         return (false, candidates[0][0]);
-    }
-
-    function watch(uint electionID) internal view {
-        // watches an election until it ends
-        Election memory election = elections[electionID];
-
-
-        while (block.timestamp < election.endTime) {}
-        // now end the election here
-        election.active = false;
-
-        
-        emit ElectionEnded(electionID, 0, 0, 0);
     }
 
     /*
