@@ -31,12 +31,13 @@ contract Ballot {
     error InvalidElectionID(uint electionID);
     error VoterAlreadyExists(uint electionID, Voter existingVoter);
     error CandidateAlreadyExists(uint electionID, Candidate existingCandidate);
+    error electionInactive(uint electionID);
 
     // Event declarations
     event ElectionInitiated(
         uint electionID, uint guildID, uint owner, uint role, uint duration, uint endTime
     );
-    event ElectionEnded(uint electionID, uint winner, uint role, uint duration);
+    event ElectionEnded(uint electionID, uint guildID, uint winner, uint role, uint duration);
     event CandidateAdded(uint electionID, uint user);
     event VoterRegistered(uint electionID, uint user);
 
@@ -66,14 +67,15 @@ contract Ballot {
     }
 
     function endElection(uint electionID) public {
-        // watches an election until it ends
         Election storage election = elections[electionID];
+
+        // check if election is initially active
+        if (election.active == true) revert electionInactive(electionID);
 
         // sets the election inactive
         election.active = false;
 
-        
-        emit ElectionEnded(electionID, 0, 0, 0); // filler data
+        emit ElectionEnded(electionID, election.guildID, 0, 0, 0); // filler data
     }
 
     function addCandidate(uint electionID, uint user) public {
@@ -96,8 +98,11 @@ contract Ballot {
         emit VoterRegistered(electionID, user);
     }
 
-    function vote(uint electionID, string memory user) public {
+    function vote(uint electionID, uint memory user) public {
         // Voting logic
+        if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
+        
+
     }
 
     function getElection(uint electionID)
