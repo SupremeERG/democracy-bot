@@ -22,12 +22,12 @@ function getRandomColor() {
 module.exports = {
     name: "ElectionEnded",
     type: "contract",
-    async execute(client, electionID, winner, role, duration) {
+    async execute(client, electionID, guildID, winner, role, duration) {
 
-        let eID = electionID._hex// Converting BigInt to String also converts the number to regular number
+        let eID = electionID._hex // Converting BigInt to String also converts the number to regular number
         console.log(`election ${eID} ended`);
 
-		/*
+		
         const guild = client.guilds.cache.find(guild => guild.id == `${guildID}`);
         let electionChannel = guild.channels.cache.find((channel) => channel.name == "elections");
 
@@ -45,6 +45,6 @@ module.exports = {
             )
             .setFooter({ text: "Join the candidacy with /join_candidacy or Vote with /vote"})
 
-        electionChannel.send({ embeds: [embed] })*/
+        electionChannel.send({ embeds: [embed] })
     }
 }

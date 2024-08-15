@@ -12,13 +12,13 @@ exec(`solcjs --bin --abi -o ${outputLocation} ${contractLocation}`, (err, stdout
     if (err) return console.error(err)
     console.log(stdout);
 
-    newContractABI = fs.readFileSync(`${outputLocation}/contracts_ballot_sol_Ballot.abi`);
-    newContractBin = fs.readFileSync(`${outputLocation}/contracts_ballot_sol_Ballot.bin`);
+    let newContractABI = Buffer.from(fs.readFileSync(`${outputLocation}/contracts_ballot_sol_Ballot.abi`)).toString();
+    let newContractBin = Buffer.from(fs.readFileSync(`${outputLocation}/contracts_ballot_sol_Ballot.bin`)).toString();
 
-    contractJSON.abi = toString(newContractABI);
+    contractJSON.abi = eval(newContractABI);
     contractJSON.bin = newContractBin;
 
-    fs.writeFileSync("contracts/build/ballot.json", JSON.stringify(contractJSON))
 
+    fs.writeFileSync("contracts/build/ballot.json", JSON.stringify(contractJSON))
 })
 

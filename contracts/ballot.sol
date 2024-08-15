@@ -116,11 +116,7 @@ contract Ballot {
         }
     }
 
-    function getElection(uint electionID)
-        public
-        view
-        returns (Election memory, Voter[] memory, Candidate[] memory)
-    {
+    function getElection(uint electionID) public view returns (Election memory, Voter[] memory, Candidate[] memory) {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
 
         Voter[] memory electionVoters = voters[electionID];
@@ -154,7 +150,7 @@ contract Ballot {
          according to https://stackoverflow.com/questions/72091082/how-to-get-a-pair-with-the-highest-value-from-a-mapping#:~:text=Solidity%20mapping%20does%20not%20support,a%20new%20entry%20is%20added. 
          I might have to add a max value property to the Election object
          */
-        (Election memory election, Voter[] memory voter, Candidate[] memory candidate) = getElection(electionID);
+        (Election memory election, , ) = getElection(electionID);
         uint currentMaxVal = election.maxVoteCount[0];
 
         /* PROBLEM WITH THIS ALGORITHM: election.maxVoteCount is an integer. There is no

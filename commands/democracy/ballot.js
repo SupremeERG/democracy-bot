@@ -3,7 +3,6 @@ const { ethers } = require('ethers');
 require('dotenv').config();
 const fs = require("fs");
 const appConfig = require("../../config.json");
-
 const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
 const privateKey = process.env.PRIVATE_KEY;
 const wallet = new ethers.Wallet(privateKey, provider);
