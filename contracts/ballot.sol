@@ -5,7 +5,7 @@ import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
 contract Ballot {
     struct Voter {
-        uint user; // discord user
+        bool registered
         bool voted;
     }
 
@@ -25,14 +25,16 @@ contract Ballot {
     }
 
     mapping(uint electionID => Election electionObject) private elections;
-    mapping(uint electionID => Voter[]) private voters;
+    mapping(uint electionID => mapping(uint user => Voter voter)) private voters;
     mapping(uint electionID => Candidate[]) private candidates;
 
     // Error declarations
     error InvalidElectionID(uint electionID);
     error VoterAlreadyExists(uint electionID, Voter existingVoter);
+    error VoterNotRegistered(uint user);
     error CandidateAlreadyExists(uint electionID, Candidate existingCandidate);
     error electionInactive(uint electionID);
+    
 
     // Event declarations
     event ElectionInitiated(
@@ -93,9 +95,10 @@ contract Ballot {
 
     function registerVoter(uint electionID, uint user) public {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
+        if (verifyVoter(electionID, user) == true) revert VoterAlreadyExists(user);
 
-        Voter memory newVoter = Voter(user, false);
-        voters[electionID].push(newVoter);
+        Voter memory newVoter = Voter(true, false);
+        voters[electionID][user] = newVoter;
 
         emit VoterRegistered(electionID, user);
     }
@@ -115,6 +118,11 @@ contract Ballot {
             return true;
         }
     }
+    function verifyVoter(uint electionID, uint user) internal view returns (bool found) {
+        Voter memory voter = voters[electionID][voter];
+        if (voter.registered == false) return false;
+        return true;
+    }
 
     function getElection(uint electionID) public view returns (Election memory, Voter[] memory, Candidate[] memory) {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
@@ -124,8 +132,6 @@ contract Ballot {
 
         return (elections[electionID], electionVoters, electionCandidates);
     }
-
-    function getVoter(uint electionID, uint user) internal view returns (bool found, Voter memory voter) {}
 
     function getCandidate(uint electionID, uint user)
         internal
@@ -143,14 +149,14 @@ contract Ballot {
     }
 
     
-    function max(uint electionID, uint8 newValue, uint candidateVoted) internal view {
+    function max(uint electionID, uint8 newValue, uint candidateVoted) internal {
         /* this function should evaluate the highest value in a mapping 
         by comparing an existing value with a new one and only
          replacing the old variable with the existing value if the comparison (newVal > highestVal)
          according to https://stackoverflow.com/questions/72091082/how-to-get-a-pair-with-the-highest-value-from-a-mapping#:~:text=Solidity%20mapping%20does%20not%20support,a%20new%20entry%20is%20added. 
          I might have to add a max value property to the Election object
          */
-        (Election memory election, , ) = getElection(electionID);
+        Election storage election = elections[electionID];
         uint currentMaxVal = election.maxVoteCount[0];
 
         /* PROBLEM WITH THIS ALGORITHM: election.maxVoteCount is an integer. There is no
