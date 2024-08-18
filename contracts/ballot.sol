@@ -5,7 +5,8 @@ import "node_modules/@openzeppelin/contracts/utils/Strings.sol";
 
 contract Ballot {
     struct Voter {
-        bool registered
+        uint user;
+        bool registered;
         bool voted;
     }
 
@@ -26,28 +27,32 @@ contract Ballot {
 
     mapping(uint electionID => Election electionObject) private elections;
     mapping(uint electionID => mapping(uint user => Voter voter)) private voters;
-    mapping(uint electionID => Candidate[]) private candidates;
+    mapping(uint electionID => Voter[]) private _voters;
+    mapping(uint electionID => mapping(uint user => Candidate candidate)) private candidates;
+    mapping(uint electionID => Candidate[]) private _candidates;
 
     // Error declarations
     error InvalidElectionID(uint electionID);
+    error ElectionInactive(uint electionID);
+    error UserAlreadyVoted(uint electionID, Voter voter);
     error VoterAlreadyExists(uint electionID, Voter existingVoter);
-    error VoterNotRegistered(uint user);
+    error VoterNotRegistered(uint electionID, uint user);
     error CandidateAlreadyExists(uint electionID, Candidate existingCandidate);
-    error electionInactive(uint electionID);
+    error CandidateDoesNotExist(uint electionID, uint user);
     
 
     // Event declarations
-    event ElectionInitiated(
-        uint electionID, uint guildID, uint owner, uint role, uint duration, uint endTime
-    );
+    event ElectionInitiated(uint electionID, uint guildID, uint owner, uint role, uint duration, uint endTime);
     event ElectionEnded(uint electionID, uint guildID, uint winner, uint role, uint duration);
     event CandidateAdded(uint electionID, uint user);
     event VoterRegistered(uint electionID, uint user);
 
 
     constructor() {
-        voters[0].push(Voter(0, true)); // initialize an empty object for return purposes
-        candidates[0].push(Candidate(0,0)); // initialize an empty object for return purposes
+        voters[0][0] = Voter(0, true, true); // initialize an empty object for return purposes
+        _voters[0].push(Voter(0, true, true));
+        candidates[0][0] = Candidate(0,0);
+        _candidates[0].push(Candidate(0,0)); // initialize an empty object for return purposes
 
     }
 
@@ -74,7 +79,7 @@ contract Ballot {
         Election storage election = elections[electionID];
 
         // check if election is initially active
-        if (election.active == true) revert electionInactive(electionID);
+        if (election.active == true) revert ElectionInactive(electionID);
 
         // sets the election inactive
         election.active = false;
@@ -88,27 +93,38 @@ contract Ballot {
         (bool exists, Candidate storage candidate) = getCandidate(electionID, user);
         if (exists != false) revert CandidateAlreadyExists(electionID, candidate);
 
-        candidates[electionID].push(Candidate(user, 0));
+        candidates[electionID][user] = Candidate(user, 0);
+        _candidates[electionID].push(Candidate(user, 0));
 
         emit CandidateAdded(electionID, user);
     }
 
     function registerVoter(uint electionID, uint user) public {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
-        if (verifyVoter(electionID, user) == true) revert VoterAlreadyExists(user);
+        if (verifyVoter(electionID, user) == true) revert VoterAlreadyExists(electionID, voters[electionID][user]);
 
-        Voter memory newVoter = Voter(true, false);
+        Voter memory newVoter = Voter(user, true, false);
         voters[electionID][user] = newVoter;
+        _voters[electionID].push(newVoter);
 
         emit VoterRegistered(electionID, user);
     }
-    /*
-    function vote(uint electionID, uint user) public {
+
+    function vote(uint electionID, uint voter, uint candidate) public {
         // Voting logic
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
+        if (verifyVoter(electionID, voter) != true) revert VoterNotRegistered(electionID, voter);
+        (bool candidateFound, Candidate storage pickedCandidate) = getCandidate(electionID, candidate);
+        if (candidateFound != true) revert CandidateDoesNotExist(electionID, candidate);
+
+        Voter storage electionVoter = voters[electionID][voter];
+        if (electionVoter.voted == true) revert UserAlreadyVoted(electionID, electionVoter); 
+
+        pickedCandidate.votes += 1;
+        electionVoter.voted = true;
         
 
-    }*/
+    }
 
     function verifyElection(uint electionID) internal view returns (bool) {
         Election memory election = elections[electionID];
@@ -119,7 +135,7 @@ contract Ballot {
         }
     }
     function verifyVoter(uint electionID, uint user) internal view returns (bool found) {
-        Voter memory voter = voters[electionID][voter];
+        Voter memory voter = voters[electionID][user];
         if (voter.registered == false) return false;
         return true;
     }
@@ -127,8 +143,8 @@ contract Ballot {
     function getElection(uint electionID) public view returns (Election memory, Voter[] memory, Candidate[] memory) {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
 
-        Voter[] memory electionVoters = voters[electionID];
-        Candidate[] memory electionCandidates = candidates[electionID];
+        Voter[] memory electionVoters = _voters[electionID];
+        Candidate[] memory electionCandidates = _candidates[electionID];
 
         return (elections[electionID], electionVoters, electionCandidates);
     }
@@ -139,13 +155,11 @@ contract Ballot {
         returns (bool found, Candidate storage candidate)
     {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
-        Candidate[] storage foundCandidates = candidates[electionID];
+        Candidate storage foundCandidate = candidates[electionID][user];
 
-        for (uint i = 0; i < foundCandidates.length; i++) {
-            if (foundCandidates[i].user == user) return (true, foundCandidates[i]);
-        }
+        if (foundCandidate.user == 0) return (false, candidates[0][0]);
 
-        return (false, candidates[0][0]);
+        return (true, foundCandidate);
     }
 
     
