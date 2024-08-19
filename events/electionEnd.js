@@ -31,17 +31,19 @@ module.exports = {
         const guild = client.guilds.cache.find(guild => guild.id == `${guildID}`);
         let electionChannel = guild.channels.cache.find((channel) => channel.name == "elections");
 
+
+        
         let [calculatedDuration, timeUnit] = calculateTime(`${duration}`);
 
         const embed = new EmbedBuilder()
             .setColor(getRandomColor())
-            .setTitle("New Election")
+            .setTitle("Election Ended")
             .setFields(
                 { name: "Election ID", value: eID },
                 { name: "Position", value: `<@&${role}>` },
-                { name: "Started by", value: `<@${initiator}>` },
+                { name: "Winner", value: `<@${winner}>`},
                 { name: "Duration", value: `${calculatedDuration} ${timeUnit}`, inline: true },
-                { name: "Ends", value: `<t:${endTime}>`, inline: true },
+                { name: "Ended", value: `<t:${Date.now()}>`, inline: true },
             )
             .setFooter({ text: "Join the candidacy with /join_candidacy or Vote with /vote"})
 

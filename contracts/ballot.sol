@@ -22,14 +22,17 @@ contract Ballot {
         uint role; // role = the position the election is held for
         uint duration;
         uint endTime;
-        uint[2] maxVoteCount;
+        uint[2] maxVote; // index 0 is the highest amount of votes in the election (x), index 1 is the user with the highest amount of votes (x)
     }
 
     mapping(uint electionID => Election electionObject) private elections;
     mapping(uint electionID => mapping(uint user => Voter voter)) private voters;
     mapping(uint electionID => Voter[]) private _voters;
+    mapping(uint electionID => mapping(uint user => uint index)) private _votersIndex; // used to be able to tell where data is in an array so I don't have to loop through it
     mapping(uint electionID => mapping(uint user => Candidate candidate)) private candidates;
     mapping(uint electionID => Candidate[]) private _candidates;
+    mapping(uint electionID => mapping(uint user => uint index)) private _candidatesIndex; // used to be able to tell where data is in an array so I don't have to loop through it
+
 
     // Error declarations
     error InvalidElectionID(uint electionID);
@@ -53,7 +56,6 @@ contract Ballot {
         _voters[0].push(Voter(0, true, true));
         candidates[0][0] = Candidate(0,0);
         _candidates[0].push(Candidate(0,0)); // initialize an empty object for return purposes
-
     }
 
 
@@ -79,33 +81,37 @@ contract Ballot {
         Election storage election = elections[electionID];
 
         // check if election is initially active
-        if (election.active == true) revert ElectionInactive(electionID);
+        if (election.active != true) revert ElectionInactive(electionID);
 
         // sets the election inactive
         election.active = false;
 
-        emit ElectionEnded(electionID, election.guildID, 0, 0, 0); // filler data
+        (uint electionWinner, , Candidate[] memory electionCandidates) = getResults(electionID);
+
+        emit ElectionEnded(electionID, election.guildID, electionWinner, election.role, election.duration);
     }
 
     function addCandidate(uint electionID, uint user) public {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
 
         (bool exists, Candidate storage candidate) = getCandidate(electionID, user);
-        if (exists != false) revert CandidateAlreadyExists(electionID, candidate);
+        if (exists == true) revert CandidateAlreadyExists(electionID, candidate);
 
         candidates[electionID][user] = Candidate(user, 0);
         _candidates[electionID].push(Candidate(user, 0));
+        _candidatesIndex[electionID][user] = _candidates[electionID].length - 1;
 
         emit CandidateAdded(electionID, user);
     }
 
     function registerVoter(uint electionID, uint user) public {
         if (verifyElection(electionID) != true) revert InvalidElectionID(electionID);
-        if (verifyVoter(electionID, user) == true) revert VoterAlreadyExists(electionID, voters[electionID][user]);
+        if (verifyVoter(electionID, user) != false) revert VoterAlreadyExists(electionID, voters[electionID][user]);
 
         Voter memory newVoter = Voter(user, true, false);
         voters[electionID][user] = newVoter;
         _voters[electionID].push(newVoter);
+        _votersIndex[electionID][user] = _voters[electionID].length - 1;
 
         emit VoterRegistered(electionID, user);
     }
@@ -118,10 +124,13 @@ contract Ballot {
         if (candidateFound != true) revert CandidateDoesNotExist(electionID, candidate);
 
         Voter storage electionVoter = voters[electionID][voter];
-        if (electionVoter.voted == true) revert UserAlreadyVoted(electionID, electionVoter); 
+        if (electionVoter.voted == true) revert UserAlreadyVoted(electionID, electionVoter);
 
         pickedCandidate.votes += 1;
+        _candidates[electionID][_candidatesIndex[electionID][candidate]].votes += 1;
         electionVoter.voted = true;
+
+        max(electionID, pickedCandidate.votes, pickedCandidate.user);
         
 
     }
@@ -163,7 +172,7 @@ contract Ballot {
     }
 
     
-    function max(uint electionID, uint8 newValue, uint candidateVoted) internal {
+    function max(uint electionID, uint newValue, uint candidateVoted) internal { // function for accounting for the highest amount of votes
         /* this function should evaluate the highest value in a mapping 
         by comparing an existing value with a new one and only
          replacing the old variable with the existing value if the comparison (newVal > highestVal)
@@ -171,10 +180,10 @@ contract Ballot {
          I might have to add a max value property to the Election object
          */
         Election storage election = elections[electionID];
-        uint currentMaxVal = election.maxVoteCount[0];
+        uint currentMaxVal = election.maxVote[0];
 
-        /* PROBLEM WITH THIS ALGORITHM: election.maxVoteCount is an integer. There is no
-        inexpensive way to fetch the corresponding user to this maxVoteCount unless I make maxVoteCount
+        /* PROBLEM WITH THIS ALGORITHM: election.maxVote is an integer. There is no
+        inexpensive way to fetch the corresponding user to this maxVote unless I make maxVote
         some type of object that will contain the user with the highest amount of votes as well as
         the amount of votes they have.
         
@@ -182,16 +191,20 @@ contract Ballot {
         */
 
         if (newValue > currentMaxVal) {
-            election.maxVoteCount[0] = newValue;
-            election.maxVoteCount[1] = candidateVoted;
+            election.maxVote[0] = newValue;
+            election.maxVote[1] = candidateVoted;
         }
     }
 
-        /*
-    function getResults(uint electionID) public view returns (string memory winner, Election memory electionTurnout) {
+
+    function getResults(uint electionID) public view returns (uint electionWinner, Election memory election, Candidate[] memory electionCandidates) {
         // this function should only return the winning user as well as vote statistics
-        (Election memory election, Voter[] memory voters, Candidate[] memory candidate) = getElection(electionID);
-        uint winner;*/
+        (Election memory election, , Candidate[] memory electionCandidates) = getElection(electionID);
+        uint winner = election.maxVote[1];
+
+        return (winner, election, electionCandidates);
+
+    }
         
 
 
