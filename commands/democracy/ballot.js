@@ -11,7 +11,7 @@ const contractAddress = appConfig.contractAddress;
 
 module.exports = {
     enabled: true,
-    cooldown: 60,
+    cooldown: 10,
     data: new SlashCommandBuilder()
         .setName('ballot')
         .setDescription('Shows the ballot for an election')
@@ -38,6 +38,7 @@ module.exports = {
                 guildID: `${election[0].guildID}`,
                 initiator: `${election[0].initiator}`,
                 role: `${election[0].role}`,
+                endTime: `${election[0].endTime}`,
                 voters: election[1],
                 candidates: election[2]
             };
@@ -52,12 +53,14 @@ module.exports = {
             
             const embed = new EmbedBuilder()
             .setTitle("Election Ballot")
-            .setDescription("Position: " + `<@&${election.role}>`)
-            .setFooter({text:"This ballot may be updated at any time so check again to see new candidates"})
+            .setDescription("Position: " + `<@&${election.role}>\n\nEnd Time: <t:${election.endTime}>`)
+            .setFooter({text:"This ballot may be updated at any time so check later to see new candidates"})
             .setColor("Aqua")
+
             candidates.forEach((candidate) => {
-                embed.setFields({name: `Candidate`, value: `<@${candidate}>`, inline: true})
-            })
+                embed.addFields({name: `Candidate`, value: `<@${candidate}>`, inline: true})
+            });
+
 
             interaction.channel.send({embeds: [embed]})
         } catch (error) {
