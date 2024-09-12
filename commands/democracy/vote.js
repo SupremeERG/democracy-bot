@@ -26,7 +26,7 @@ module.exports = {
             .setDescription('The candidate you would like to vote for')
             .setRequired(true)),
     async execute(client, interaction) {
-        await interaction.deferReply({ ephemral: true });
+        await interaction.deferReply({ ephemeral: true });
 
         const electionID = interaction.options.getString("electionid");
         const pickedCandidate = interaction.options.getString("candidate").slice(2, -1);
@@ -35,7 +35,7 @@ module.exports = {
         try { 
             await contract.vote(electionID, user, pickedCandidate)
 
-            interaction.editReply("You are now registered as a valid voter");
+            interaction.editReply(`You just voted for <@${pickedCandidate}>`);
             
         } catch (error) {
             console.log("ERROR VOTING");

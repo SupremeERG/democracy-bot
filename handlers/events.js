@@ -1,6 +1,6 @@
 const path = require("node:path");
 const fs = require("node:fs");
-const {ethers} = require("ethers");
+const { ethers } = require("ethers");
 const eventsPath = path.join(__dirname, '../events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 const appConfig = require("../config.json");
@@ -26,6 +26,8 @@ module.exports = {
                         if (args[args.length - 1].blockNumber <= startBlockNumber) return; // stops the bot from executing on existing blockchain events
 
                         event.execute(client, ...args);
+
+
                     })
 
                 }
@@ -43,12 +45,12 @@ module.exports = {
     restartListener: async function (client, contract) {
         client.removeAllListeners();
         await contract.removeAllListeners();
-        
+
         const contractData = JSON.parse(fs.readFileSync("contracts/build/ballot.json"));
         const provider = new ethers.providers.JsonRpcProvider(appConfig.rpcEndpoint);
         const defaultAccount = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
         const freshContract = new ethers.Contract(appConfig.contractAddress, contractData.abi, defaultAccount)
-        
+
         this.listen(client, freshContract);
         console.log("Listener restarted")
     }

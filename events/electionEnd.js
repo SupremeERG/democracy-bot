@@ -23,6 +23,13 @@ module.exports = {
     name: "ElectionEnded",
     type: "contract",
     async execute(client, electionID, guildID, winner, role, duration) {
+        
+
+        let electionWinner = winner;
+
+        if (electionWinner == 0) electionWinner = "None (no candidates voted for)"
+        else electionWinner = `<@${electionWinner}>`;
+
 
         let eID = electionID._hex // Converting BigInt to String also converts the number to regular number
         console.log(`election ${eID} ended`);
@@ -33,6 +40,7 @@ module.exports = {
 
 
         
+
         let [calculatedDuration, timeUnit] = calculateTime(`${duration}`);
 
         const embed = new EmbedBuilder()
@@ -41,7 +49,7 @@ module.exports = {
             .setFields(
                 { name: "Election ID", value: eID },
                 { name: "Position", value: `<@&${role}>` },
-                { name: "Winner", value: `<@${winner}>`},
+                { name: "Winner", value: electionWinner},
                 { name: "Duration", value: `${calculatedDuration} ${timeUnit}`, inline: true },
                 { name: "Ended", value: `<t:${Date.now()}>`, inline: true },
             )
