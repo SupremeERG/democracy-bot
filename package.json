@@ -6,10 +6,22 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "nodemonConfig": {
+    "ignore": [
+      "config.json"
+    ]
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
     "discord.js": "^14.15.3",
-    "dotenv": "^16.4.5"
+    "dotenv": "^16.4.5",
+    "ethers": "^5.7.2",
+    "ethers-decode-error": "1.0",
+    "hardhat": "^2.22.6",
+    "solc": "^0.8.26",
+    "undici": "^5.28.4",
+    "web3": "^4.11.1"
   }
 }
